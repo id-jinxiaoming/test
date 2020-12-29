@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task.xsd">
+
+
+    <!--spring配置-->
+    <!--开启注解的扫描，希望处理service和dao，controller不需要Spring框架去处理-->
+    <context:component-scan base-package="com.mzjicai" >
+        <!--配置哪些注解不扫描-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
+    <!--Spring整合MyBatis框架-->
+    <!--配置连接池-->
+    <context:property-placeholder location="classpath:config.properties" />
+
+    <bean name="dataSourced" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${jdbc_url}" />
+        <property name="username" value="${jdbc_username}" />
+        <property name="password" value="${jdbc_password}" />
+
+        <property name="initialSize" value="0" />
+        <property name="maxActive" value="20" />
+        <property name="maxIdle" value="20" />
+        <property name="minIdle" value="0" />
+        <property name="maxWait" value="60000" />
+
+        <property name="validationQuery" value="${validationQuery}" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="testWhileIdle" value="true" />
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <property name="minEvictableIdleTimeMillis" value="25200000" />
+        <property name="removeAbandoned" value="true" />
+        <property name="removeAbandonedTimeout" value="1800" />
+        <property name="logAbandoned" value="true" />
+        <property name="filters" value="mergeStat" />
+    </bean>
+
+    <!--配置SqlSessionFactory工厂-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSourced"/>
+    </bean>
+
+    <!--配置AccountDao接口所在包-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.mzjicai.dao"/>
+    </bean>
+
+
+    <!--配置Spring框架声明式事务管理 AspectJ的xml方式、还有注册方式以及TransactionProxyFactoryBean的方式-->
+    <!--配置事务管理器 start-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSourced" />
+    </bean>
+    <!--配置事务通知-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="*" isolation="DEFAULT"/><!--个理级别-->
+        </tx:attributes>
+    </tx:advice>
+    <!--配置AOP增强-->
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.mzjicai.service.impl.*ServiceImpl.*(..))"/>
+    </aop:config>
+    <!--配置事务管理器 end-->
+
+</beans>
