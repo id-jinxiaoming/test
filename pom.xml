@@ -209,7 +209,7 @@
           <version>0.4.13</version>
           <configuration>
             <!--用于指定镜像名称-->
-            <imageName>hub.mzjicai.com/java/${project.artifactId}:${project.version}</imageName>
+            <imageName>hub.mzjicai.com/test/${project.artifactId}:${project.version}</imageName>
             <!--用于指定基础镜像，相当于Dockerfile中的FROM指令-->
             <baseImage>hub.mzjicai.com/java/jdk1.8:v1</baseImage>
             <!--指定工作目录-->
