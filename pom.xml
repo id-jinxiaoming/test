@@ -13,6 +13,8 @@
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
+
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
@@ -209,7 +211,7 @@
           <version>0.4.13</version>
           <configuration>
             <!--用于指定镜像名称-->
-            <imageName>mavendemo</imageName>
+            <imageName>hub.mzjicai.com/test/${project.artifactId}:${project.version}</imageName>
             <!--用于指定基础镜像，相当于Dockerfile中的FROM指令-->
             <baseImage>hub.mzjicai.com/java/jdk1.8:v1</baseImage>
             <!--指定工作目录-->
@@ -233,37 +235,6 @@
             <!--<dockerHost>http://192.168.37.146:2375</dockerHost>-->
             <serverId>my-docker-registry</serverId>
           </configuration>
-          <!--使用私有仓库地址-->
-          <executions>
-            <execution>
-              <id>build-image</id>
-              <phase>package</phase>
-              <goals>
-                <goal>build</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>tag-image</id>
-              <phase>package</phase>
-              <goals>
-                <goal>tag</goal>
-              </goals>
-              <configuration>
-                <image>mavendemo:latest</image>
-                <newName>hub.mzjicai.com/test/${project.artifactId}:${project.version}</newName>
-              </configuration>
-            </execution>
-            <execution>
-              <id>push-image</id>
-              <phase>deploy</phase>
-              <goals>
-                <goal>push</goal>
-              </goals>
-              <configuration>
-                <imageName>hub.mzjicai.com/test/${project.artifactId}:${project.version}</imageName>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
